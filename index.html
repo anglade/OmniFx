@@ -417,7 +417,7 @@
     requestAnimationFrame(tick);
   }
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const cio=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){const el=e.target;cio.unobserve(el);if(reduce){el.textContent=fmt(parseFloat(el.dataset.num),el.dataset.fmt);}else{animateCount(el);}}});},{threshold:.6});
+  const cio=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){const el=e.target;cio.unobserve(el);if(reduce){el.textContent=fmt(parseFloat(el.dataset.num),el.dataset.fmt);}else{animateCount(el);}}});},{threshold:.1});
   document.querySelectorAll('.countup').forEach(el=>cio.observe(el));
 
   const rail=document.getElementById('rail');
