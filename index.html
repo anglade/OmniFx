@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>document.documentElement.classList.add('js');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OmniFX — How one person built a $1.2M forex education company from zero</title>
@@ -91,8 +92,9 @@
   .act p b{font-weight:600;color:var(--ink)}
   .act p .hl{color:var(--accent);font-weight:600}
 
-  .rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
-  .rv.in{opacity:1;transform:none}
+  .rv{opacity:1;transform:none}
+  .js .rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .js .rv.in{opacity:1;transform:none}
 
   .bet h2{max-width:24ch}
   .quote{margin:8px 0 0;padding:34px 0 34px 32px;border-left:3px solid var(--accent);max-width:60ch}
@@ -186,7 +188,7 @@
   footer .meta a:hover{color:var(--accent)}
 
   @media(prefers-reduced-motion:reduce){
-    .rv{opacity:1;transform:none;transition:none}
+    .js .rv{opacity:1;transform:none;transition:none}
     .diagram .stage .node,.conn::after,.backbone{opacity:1!important;transform:none!important;transition:none!important}
     html{scroll-behavior:auto}
   }
@@ -378,10 +380,25 @@
   addEventListener('scroll',()=>chrome.classList.toggle('stuck',scrollY>20));
 
   const rio=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target);}});},{threshold:.15,rootMargin:'0px 0px -8% 0px'});
-  document.querySelectorAll('.rv').forEach(el=>rio.observe(el));
+  const rvEls=document.querySelectorAll('.rv');
+  rvEls.forEach(el=>rio.observe(el));
+  function revealInView(els,rootBottom=window.innerHeight*0.92){
+    els.forEach(el=>{
+      if(el.classList.contains('in'))return;
+      const r=el.getBoundingClientRect();
+      if(r.top<rootBottom&&r.bottom>0)el.classList.add('in');
+    });
+  }
+  revealInView(rvEls);
+  addEventListener('load',()=>revealInView(rvEls));
 
   const dgm=document.getElementById('diagram');
-  if(dgm){new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){dgm.classList.add('go');o.disconnect();}});},{threshold:.4}).observe(dgm);}
+  if(dgm){
+    const dgo=new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){dgm.classList.add('go');o.disconnect();}});},{threshold:.4});
+    dgo.observe(dgm);
+    const dr=dgm.getBoundingClientRect();
+    if(dr.top<window.innerHeight&&dr.bottom>0)dgm.classList.add('go');
+  }
 
   function fmt(v,f){
     if(f==='money-m')return '$'+v.toFixed(1)+'M';
